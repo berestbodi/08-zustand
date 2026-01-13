@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import {
   dehydrate,
   HydrationBoundary,
@@ -8,6 +9,29 @@ import NoteDetailsClient from "./NoteDetails.client";
 
 interface Props {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+
+  const note = await fetchNoteById(id);
+
+  return {
+    title: `${note.title} | NoteHub`,
+    description: note.content.slice(0, 160),
+    openGraph: {
+      title: note.title,
+      description: note.content.slice(0, 160),
+      url: `https://notehub-app.vercel.app/notes/${id}`, // url
+      images: [
+        {
+          url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+          alt: note.title,
+        },
+      ],
+      type: "article",
+    },
+  };
 }
 
 export default async function NoteDetailsPage({ params }: Props) {
